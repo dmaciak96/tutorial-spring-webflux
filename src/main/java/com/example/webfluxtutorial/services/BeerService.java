@@ -9,4 +9,10 @@ public interface BeerService {
     Flux<BeerDTO> listBeers();
 
     Mono<BeerDTO> findById(int beerId);
+
+    Mono<BeerDTO> save(BeerDTO beerDTO);
+
+    Mono<BeerDTO> update(int beerId, BeerDTO beerDTO);
+
+    Mono<Void> delete(int beerId);
 }

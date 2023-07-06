@@ -8,4 +8,6 @@ import org.mapstruct.Mapper;
 public interface BeerMapper {
 
     BeerDTO beerToBeerDTO(Beer beer);
+
+    Beer beerDtoToBeer(BeerDTO beerDTO);
 }
