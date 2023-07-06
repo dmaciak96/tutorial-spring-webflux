@@ -43,6 +43,14 @@ class BeerControllerTest {
     }
 
     @Test
+    void testGetByIdNotFound() {
+        webTestClient.get()
+                .uri(BeerController.BEER_PATH_ID, 8)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
     void testSave() {
         webTestClient.post()
                 .uri(BeerController.BEER_PATH)
@@ -51,6 +59,17 @@ class BeerControllerTest {
                 .expectStatus().isCreated()
                 .expectHeader().valueEquals("Content-type", "application/json")
                 .expectBody(BeerDTO.class);
+    }
+
+    @Test
+    void testSaveBadData() {
+        var beer = getTestBeer();
+        beer.setBeerName("");
+        webTestClient.post()
+                .uri(BeerController.BEER_PATH)
+                .body(Mono.just(beer), BeerDTO.class)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -68,11 +87,39 @@ class BeerControllerTest {
     }
 
     @Test
+    void testUpdateNotFound() {
+        webTestClient.put()
+                .uri(BeerController.BEER_PATH_ID, 8)
+                .body(Mono.just(getTestBeer()), BeerDTO.class)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void testUpdateBadData() {
+        var beer = getTestBeer();
+        beer.setBeerName("");
+        webTestClient.put()
+                .uri(BeerController.BEER_PATH_ID, 2)
+                .body(Mono.just(beer), BeerDTO.class)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
     void testDelete() {
         webTestClient.delete()
                 .uri(BeerController.BEER_PATH_ID, 1)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    void testDeleteNotFound() {
+        webTestClient.delete()
+                .uri(BeerController.BEER_PATH_ID, 9)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     private BeerDTO getTestBeer() {

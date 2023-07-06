@@ -3,6 +3,7 @@ package com.example.webfluxtutorial.controllers;
 import com.example.webfluxtutorial.model.BeerDTO;
 import com.example.webfluxtutorial.services.BeerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,7 +34,8 @@ public class BeerController {
 
     @GetMapping(BEER_PATH_ID)
     public Mono<BeerDTO> findById(@PathVariable int beerId) {
-        return beerService.findById(beerId);
+        return beerService.findById(beerId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @PostMapping(BEER_PATH)
@@ -48,12 +51,15 @@ public class BeerController {
     public Mono<ResponseEntity<BeerDTO>> update(@PathVariable int beerId,
                                                 @Validated @RequestBody BeerDTO beerDTO) {
         return beerService.update(beerId, beerDTO)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                 .map(ResponseEntity::ok);
     }
 
     @DeleteMapping(BEER_PATH_ID)
     public Mono<ResponseEntity<Void>> delete(@PathVariable int beerId) {
-        return beerService.delete(beerId)
+        return beerService.findById(beerId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                .map(beerDTO -> beerService.delete(beerDTO.getId()))
                 .thenReturn(ResponseEntity.noContent().build());
     }
 }
