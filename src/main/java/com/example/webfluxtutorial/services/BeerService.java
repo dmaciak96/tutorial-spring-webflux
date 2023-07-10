@@ -5,14 +5,18 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface BeerService {
+    Flux<BeerDTO> findAll();
 
-    Flux<BeerDTO> listBeers();
-
-    Mono<BeerDTO> findById(int beerId);
+    Mono<BeerDTO> save(Mono<BeerDTO> beerDTO);
 
     Mono<BeerDTO> save(BeerDTO beerDTO);
 
-    Mono<BeerDTO> update(int beerId, BeerDTO beerDTO);
+    Mono<BeerDTO> getById(String id);
 
-    Mono<Void> delete(int beerId);
+    Mono<BeerDTO> update(String id, BeerDTO beerDTO);
+
+    Mono<BeerDTO> patch(String id, BeerDTO beerDTO);
+
+    void deleteById(String id);
+
 }

@@ -2,7 +2,7 @@ package com.example.webfluxtutorial.services;
 
 import com.example.webfluxtutorial.mappers.BeerMapper;
 import com.example.webfluxtutorial.model.BeerDTO;
-import com.example.webfluxtutorial.repository.BeerRepository;
+import com.example.webfluxtutorial.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -15,42 +15,42 @@ public class BeerServiceImpl implements BeerService {
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
 
+
     @Override
-    public Flux<BeerDTO> listBeers() {
-        return beerRepository.findAll()
-                .map(beerMapper::beerToBeerDTO);
+    public Flux<BeerDTO> findAll() {
+        return null;
     }
 
     @Override
-    public Mono<BeerDTO> findById(int beerId) {
-        return beerRepository.findById(beerId)
-                .map(beerMapper::beerToBeerDTO);
-    }
-
-    @Override
-    public Mono<BeerDTO> save(BeerDTO beerDTO) {
-        return beerRepository.save(beerMapper.beerDtoToBeer(beerDTO))
-                .map(beerMapper::beerToBeerDTO);
-    }
-
-    @Override
-    public Mono<BeerDTO> update(int beerId, BeerDTO beerDTO) {
-        beerDTO.setId(beerId);
-        return beerRepository.findById(beerId)
-                .map(beer -> {
-                    beer.setBeerName(beerDTO.getBeerName());
-                    beer.setBeerStyle(beerDTO.getBeerStyle());
-                    beer.setPrice(beerDTO.getPrice());
-                    beer.setUpc(beerDTO.getUpc());
-                    beer.setQuantityOnHand(beerDTO.getQuantityOnHand());
-                    return beer;
-                })
+    public Mono<BeerDTO> save(Mono<BeerDTO> beerDTO) {
+        return beerDTO.map(beerMapper::beerDtoToBeer)
                 .flatMap(beerRepository::save)
                 .map(beerMapper::beerToBeerDTO);
     }
 
     @Override
-    public Mono<Void> delete(int beerId) {
-        return beerRepository.deleteById(beerId);
+    public Mono<BeerDTO> save(BeerDTO beerDTO) {
+        return null;
+    }
+
+    @Override
+    public Mono<BeerDTO> getById(String id) {
+        return beerRepository.findById(Mono.just(id))
+                .map(beerMapper::beerToBeerDTO);
+    }
+
+    @Override
+    public Mono<BeerDTO> update(String id, BeerDTO beerDTO) {
+        return null;
+    }
+
+    @Override
+    public Mono<BeerDTO> patch(String id, BeerDTO beerDTO) {
+        return null;
+    }
+
+    @Override
+    public void deleteById(String id) {
+
     }
 }
